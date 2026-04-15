@@ -33,7 +33,7 @@ for symbol in stocks:
         last_k = df.iloc[-1]["%k"]
         last_d = df.iloc[-1]["%d"]
 
-        if last_k < 20 and last_d < 20:
+      if True:
             send(f"🚨 {symbol} K={round(last_k,2)} D={round(last_d,2)} {datetime.now()}")
 
     except:
