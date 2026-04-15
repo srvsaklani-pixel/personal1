@@ -3,8 +3,10 @@ import pandas as pd
 import requests
 from datetime import datetime
 
-BOT_TOKEN = "8684314803:AAHiUYBClepHX8gptTX4Vu52Y_1bJ0-Ctxs"
-CHAT_ID = "5926424014"
+import os
+
+BOT_TOKEN = os.getenv("8684314803:AAHiUYBClepHX8gptTX4Vu52Y_1bJ0-Ctxs")
+CHAT_ID = os.getenv("5926424014")
 
 stocks = ["RELIANCE.NS", "TCS.NS", "INFY.NS"]
 
