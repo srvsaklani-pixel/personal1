@@ -6,7 +6,6 @@ from datetime import datetime
 BOT_TOKEN = "8693861675:AAH20sGC3PU_ehueIVTLT73UwwVHTCl4uxQ"
 CHAT_ID = "5067510130"
 
-# ✅ YOUR STOCK LIST (CORRECTED)
 stocks = [
     "ICICIBANK.NS", "ICICIPRULI.NS", "INFY.NS", "ITC.NS",
     "KOTAKBANK.NS", "LT.NS", "MARICO.NS", "NESTLEIND.NS",
@@ -18,19 +17,24 @@ def send(msg):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     requests.get(url, params={"chat_id": CHAT_ID, "text": msg})
 
-print("🚀 SCANNING YOUR STOCK LIST...")
+now = datetime.now()
 
+print("🚀 BOT RUNNING AT:", now.strftime("%H:%M"))
+
+# ===== 30-MIN HEARTBEAT =====
+if now.minute % 30 == 0:
+    send(f"✅ Bot running fine at {now.strftime('%H:%M')}")
+
+# ===== STOCK SCAN =====
 for symbol in stocks:
     try:
         df = yf.download(symbol, period="6mo", interval="1d", progress=False)
 
         if df is None or df.empty:
-            print(f"No data for {symbol}")
             continue
 
         df = df.reset_index()
 
-        # STOCHASTIC (4,3,3)
         low_min = df['Low'].rolling(4).min()
         high_max = df['High'].rolling(4).max()
 
