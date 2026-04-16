@@ -8,7 +8,7 @@ BOT_TOKEN = "8693861675:AAH20sGC3PU_ehueIVTLT73UwwVHTCl4uxQ"
 CHAT_ID = "5067510130"
 
 # ===== STOCK LIST =====
-stocks = ["RELIANCE.NS", "TCS.NS", "INFY.NS"]
+stocks = ["RELIANCE.NS"]
 
 # ===== TELEGRAM FUNCTION =====
 def send(msg):
@@ -19,11 +19,12 @@ def send(msg):
     })
     print("Telegram:", response.text)
 
-print("🚀 BOT RUNNING...")
+print("🚀 BOT RUNNING (DAILY)...")
 
 for symbol in stocks:
     try:
-        df = yf.download(symbol, period="1d", interval="5m", progress=False)
+        # ===== DAILY DATA =====
+        df = yf.download(symbol, period="6mo", interval="1d", progress=False)
 
         if df is None or df.empty:
             print(f"No data for {symbol}")
@@ -31,32 +32,32 @@ for symbol in stocks:
 
         df = df.reset_index()
 
-        # ===== STOCHASTIC (4,3,3) CORRECT =====
-        low_min = df["Low"].rolling(window=4).min()
-        high_max = df["High"].rolling(window=4).max()
+        # ===== STOCHASTIC (4,3,3) =====
+        low_min = df['Low'].rolling(window=4).min()
+        high_max = df['High'].rolling(window=4).max()
 
-        raw_k = (df["Close"] - low_min) / (high_max - low_min) * 100
+        df['raw_k'] = ((df['Close'] - low_min) / (high_max - low_min)) * 100
 
-        smooth_k = raw_k.rolling(window=3).mean()   # smooth %K
-        smooth_d = smooth_k.rolling(window=3).mean()  # %D
+        df['k'] = df['raw_k'].rolling(window=3).mean()
+        df['d'] = df['k'].rolling(window=3).mean()
 
-        df["%k"] = smooth_k
-        df["%d"] = smooth_d
+        # Remove NaN
+        df = df.dropna()
 
         # ===== LAST VALUES =====
-        last_k = float(df["%k"].iloc[-1])
-        last_d = float(df["%d"].iloc[-1])
+        last_k = float(df['k'].iloc[-1])
+        last_d = float(df['d'].iloc[-1])
 
         print(symbol, round(last_k, 2), round(last_d, 2))
 
-        # ===== TEST CONDITION =====
-        if last_k < 70 and last_d < 70:
-            msg = f"""🚨 TEST ALERT
+        # ===== ALERT CONDITION =====
+        if last_k < 20 and last_d < 20:
+            msg = f"""🚨 DAILY STOCHASTIC ALERT
 
 Stock: {symbol}
 K: {round(last_k,2)}
 D: {round(last_d,2)}
-Time: {datetime.now().strftime('%H:%M:%S')}
+Date: {df['Date'].iloc[-1].strftime('%Y-%m-%d')}
 """
             send(msg)
 
