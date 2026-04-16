@@ -2,6 +2,7 @@ name: Stock Alert Bot
 
 on:
   schedule:
+    # Runs every 5 minutes during market hours (Mon–Fri)
     - cron: "*/5 4-10 * * 1-5"
   workflow_dispatch:
 
@@ -10,19 +11,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Get your code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2. Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install libraries
+      # 3. Install libraries
+      - name: Install dependencies
         run: pip install -r requirements.txt
 
-     - name: Run bot
-  run: python bot.py
-  env:
-    BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-    CHAT_ID: ${{ secrets.CHAT_ID }}
+      # 4. Run your bot (IMPORTANT PART)
+      - name: Run bot
+        run: python bot.py
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
