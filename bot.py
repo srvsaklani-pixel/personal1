@@ -36,7 +36,8 @@ for symbol in stocks:
         print(symbol, last_k, last_d)
 
         # ✅ TEMP TEST (always send alert)
-        if True:
+      msg = "🚀 TEST MESSAGE FROM BOT"
+send(msg)
             msg = f"TEST ALERT\n{symbol}\nK={round(last_k,2)} D={round(last_d,2)}"
             send(msg)
 
