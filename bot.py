@@ -5,26 +5,24 @@ from datetime import datetime
 
 # ===== TELEGRAM DETAILS =====
 BOT_TOKEN = "8693861675:AAH20sGC3PU_ehueIVTLT73UwwVHTCl4uxQ"
-CHAT_ID = "5067510130"
+CHAT_ID = "5926424014"
 
 # ===== STOCK LIST =====
 stocks = ["RELIANCE.NS", "TCS.NS", "INFY.NS"]
 
-# ===== SEND TELEGRAM MESSAGE (IMPROVED) =====
+# ===== TELEGRAM FUNCTION =====
 def send(msg):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     response = requests.get(url, params={
         "chat_id": CHAT_ID,
         "text": msg
     })
-
-    print("Telegram response:", response.text)  # 🔥 IMPORTANT
+    print("Telegram:", response.text)
 
 print("🚀 BOT RUNNING...")
 
 for symbol in stocks:
     try:
-        # ===== FETCH DATA =====
         df = yf.download(symbol, period="1d", interval="5m", progress=False)
 
         if df is None or df.empty:
@@ -33,13 +31,17 @@ for symbol in stocks:
 
         df = df.reset_index()
 
-        # ===== STOCHASTIC =====
-        low_min = df["Low"].rolling(4).min()
-        high_max = df["High"].rolling(4).max()
+        # ===== STOCHASTIC (4,3,3) CORRECT =====
+        low_min = df["Low"].rolling(window=4).min()
+        high_max = df["High"].rolling(window=4).max()
 
-        df["%k"] = (df["Close"] - low_min) / (high_max - low_min) * 100
-        df["%d"] = df["%k"].rolling(3).mean()
-        df["%k"] = df["%k"].rolling(3).mean()
+        raw_k = (df["Close"] - low_min) / (high_max - low_min) * 100
+
+        smooth_k = raw_k.rolling(window=3).mean()   # smooth %K
+        smooth_d = smooth_k.rolling(window=3).mean()  # %D
+
+        df["%k"] = smooth_k
+        df["%d"] = smooth_d
 
         # ===== LAST VALUES =====
         last_k = float(df["%k"].iloc[-1])
@@ -47,7 +49,7 @@ for symbol in stocks:
 
         print(symbol, round(last_k, 2), round(last_d, 2))
 
-        # ===== TEMP TEST (FOR CONFIRMATION) =====
+        # ===== TEST CONDITION =====
         if last_k < 70 and last_d < 70:
             msg = f"""🚨 TEST ALERT
 
