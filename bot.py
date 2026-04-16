@@ -5,7 +5,7 @@ from datetime import datetime
 
 # ===== TELEGRAM DETAILS =====
 BOT_TOKEN = "8693861675:AAH20sGC3PU_ehueIVTLT73UwwVHTCl4uxQ"
-CHAT_ID = "5926424014"
+CHAT_ID = "5067510130"
 
 # ===== STOCK LIST =====
 stocks = ["RELIANCE.NS", "TCS.NS", "INFY.NS"]
