@@ -5,7 +5,7 @@ from datetime import datetime
 import pytz
 
 BOT_TOKEN = "8693861675:AAH20sGC3PU_ehueIVTLT73UwwVHTCl4uxQ"
-CHAT_ID = "5067510130"
+CHAT_ID = "1003904590545"
 
 stocks = [
     "ICICIBANK.NS", "ICICIPRULI.NS", "INFY.NS", "ITC.NS",
