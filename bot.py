@@ -3,25 +3,32 @@ import pandas as pd
 import requests
 from datetime import datetime
 
-# 🔴 DIRECT VALUES (TEMPORARY FIX)
+# ===== TELEGRAM DETAILS =====
 BOT_TOKEN = "8693861675:AAH20sGC3PU_ehueIVTLT73UwwVHTCl4uxQ"
 CHAT_ID = "5926424014"
 
+# ===== STOCK LIST =====
 stocks = ["RELIANCE.NS", "TCS.NS", "INFY.NS"]
 
+# ===== SEND TELEGRAM MESSAGE =====
 def send(msg):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     requests.post(url, data={"chat_id": CHAT_ID, "text": msg})
 
+print("🚀 BOT RUNNING...")
+
 for symbol in stocks:
     try:
+        # ===== FETCH DATA =====
         df = yf.download(symbol, period="1d", interval="5m", progress=False)
 
-        if df.empty:
+        if df is None or df.empty:
+            print(f"No data for {symbol}")
             continue
 
         df = df.reset_index()
 
+        # ===== STOCHASTIC (4,3,3) =====
         low_min = df["Low"].rolling(4).min()
         high_max = df["High"].rolling(4).max()
 
@@ -29,13 +36,15 @@ for symbol in stocks:
         df["%d"] = df["%k"].rolling(3).mean()
         df["%k"] = df["%k"].rolling(3).mean()
 
-        last_k = df.iloc[-1]["%k"]
-        last_d = df.iloc[-1]["%d"]
+        # ===== GET LAST VALUES (FIXED) =====
+        last_k = float(df["%k"].iloc[-1])
+        last_d = float(df["%d"].iloc[-1])
 
-        print(symbol, last_k, last_d)
+        print(symbol, round(last_k, 2), round(last_d, 2))
 
+        # ===== ALERT CONDITION =====
         if last_k < 20 and last_d < 20:
-            msg = f"""🚨 ALERT
+            msg = f"""🚨 STOCHASTIC ALERT
 
 Stock: {symbol}
 K: {round(last_k,2)}
