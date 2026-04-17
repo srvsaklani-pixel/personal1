@@ -2,8 +2,8 @@ name: Stock Alert Bot
 
 on:
   schedule:
-    # Runs every 5 minutes during market hours (Mon–Fri)
-    - cron: "*/5 4-10 * * 1-5"
+   # Runs automatically every 4 hours (UTC)
+    - cron: "0 */4 * * *"
   workflow_dispatch:
 
 jobs:
